@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imunoquest — Operação Defesa</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Ir para o conteúdo</a>
+
+<div id="app">
+
+  <!-- ============ MENU ============ -->
+  <section id="screen-menu" class="screen is-active" aria-labelledby="menu-title">
+    <div class="menu-wrap">
+      <header class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="64" height="64">
+            <path d="M32 4 L56 14 V32 C56 47 45 57 32 60 C19 57 8 47 8 32 V14 Z" fill="none" stroke="var(--teal)" stroke-width="2.5"/>
+            <circle cx="32" cy="30" r="11" fill="none" stroke="var(--violet)" stroke-width="2.5"/>
+            <circle cx="28" cy="27" r="3.4" fill="var(--violet)"/>
+            <circle cx="36" cy="26" r="3" fill="var(--violet)"/>
+            <circle cx="33" cy="34" r="3.2" fill="var(--violet)"/>
+          </svg>
+        </div>
+        <div>
+          <p class="brand-kicker">Recurso educativo · PIBID</p>
+          <h1 id="menu-title">Imunoquest<span>Operação Defesa</span></h1>
+        </div>
+      </header>
+
+      <p class="menu-lead">
+        Um jogo de estratégia sobre o sistema imunitário humano. Defenda o tecido
+        contra agentes invasores usando os mecanismos de defesa do organismo — e
+        entenda, jogando, como o corpo se protege.
+      </p>
+
+      <nav class="menu-nav" aria-label="Menu principal">
+        <button class="menu-btn menu-btn--primary" data-goto="game" data-phase="1">
+          <span class="menu-btn-title">Jogar — Fase 1</span>
+          <span class="menu-btn-sub">A Primeira Barreira</span>
+        </button>
+        <button class="menu-btn" data-goto="game" data-phase="2" id="menu-phase-2">
+          <span class="menu-btn-title">Jogar — Fase 2</span>
+          <span class="menu-btn-sub">Alarme e Fagocitose</span>
+        </button>
+        <button class="menu-btn" data-goto="game" data-phase="3" id="menu-phase-3">
+          <span class="menu-btn-title">Jogar — Fase 3</span>
+          <span class="menu-btn-sub">Vigilância e Febre</span>
+        </button>
+        <button class="menu-btn" data-goto="game" data-phase="4" id="menu-phase-4">
+          <span class="menu-btn-title">Jogar — Fase 4</span>
+          <span class="menu-btn-sub">Defesa Especializada</span>
+        </button>
+        <button class="menu-btn" data-goto="game" data-phase="5" id="menu-phase-5">
+          <span class="menu-btn-title">Jogar — Fase 5</span>
+          <span class="menu-btn-sub">O Inimigo Retorna</span>
+        </button>
+        <button class="menu-btn" data-goto="game" data-phase="6" id="menu-phase-6">
+          <span class="menu-btn-title">Jogar — Fase 6</span>
+          <span class="menu-btn-sub">Operação Defesa</span>
+        </button>
+        <button class="menu-btn" data-goto="game" data-phase="1" data-tutorial="1">
+          <span class="menu-btn-title">Como jogar</span>
+          <span class="menu-btn-sub">Tutorial guiado (2–3 min)</span>
+        </button>
+        <button class="menu-btn" data-goto="encyclopedia">
+          <span class="menu-btn-title">Central do Sistema Imunitário</span>
+          <span class="menu-btn-sub">Consulte os conceitos</span>
+        </button>
+        <button class="menu-btn" data-goto="settings">
+          <span class="menu-btn-title">Configurações</span>
+          <span class="menu-btn-sub">Acessibilidade · som · velocidade</span>
+        </button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <main id="screen-game" class="screen" role="main" aria-labelledby="game-phase-name" hidden>
+    <div id="main" tabindex="-1"></div>
+
+    <div class="game-topbar">
+      <button class="ghost-btn" data-goto="menu" aria-label="Voltar ao menu">‹ Menu</button>
+      <h2 id="game-phase-name" class="game-phase-name">Fase 1 — A Primeira Barreira</h2>
+      <div class="hud" aria-label="Situação da defesa">
+        <span class="hud-pill hud-pill--resource">
+          <svg class="hud-coin" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.5" fill="#dd9a44" opacity=".28"/>
+            <circle cx="10" cy="10" r="8.5" fill="none" stroke="#dd9a44" stroke-width="1.4"/>
+            <circle cx="7.8" cy="8.3" r="1.7" fill="#dd9a44"/>
+            <circle cx="12.6" cy="9" r="1.3" fill="#dd9a44"/>
+            <circle cx="10" cy="12.6" r="1.5" fill="#dd9a44"/>
+          </svg>
+          <span class="hud-k">Recurso</span><span class="hud-v" id="hud-resource">45</span></span>
+        <span class="hud-pill"><span class="hud-k">Tecido</span>
+          <span class="hud-bar" aria-hidden="true"><i id="hud-tissue-bar"></i></span>
+          <span class="hud-v" id="hud-tissue">100%</span></span>
+        <span class="hud-pill"><span class="hud-k">Onda</span><span class="hud-v" id="hud-wave">0 / 5</span></span>
+      </div>
+      <div class="game-controls">
+        <button id="btn-timemode" class="icon-btn is-on" aria-pressed="true"
+          title="Modo sem pressão de tempo: a onda só começa quando você mandar">⏱ Sem pressa</button>
+        <button id="btn-speed" class="icon-btn" aria-label="Velocidade do jogo">1×</button>
+        <button id="btn-pause" class="icon-btn" aria-label="Pausar">⏸ Pausar</button>
+        <button id="btn-release" class="release-btn">Liberar onda</button>
+      </div>
+    </div>
+
+    <div class="game-stage">
+      <div class="canvas-holder">
+        <canvas id="game-canvas" width="960" height="600"
+          aria-label="Campo de jogo. Use Tab para navegar pelos nichos de defesa."
+          role="img"></canvas>
+
+        <ul class="slot-layer" id="slot-layer" aria-label="Nichos de defesa"></ul>
+
+        <button id="btn-help" class="icon-btn icon-btn--help" type="button"
+          title="O que essa fase ensina" aria-label="O que essa fase ensina">?</button>
+
+        <div class="briefing" id="briefing" role="status" hidden>
+          <p class="briefing-tag">Briefing</p>
+          <p class="briefing-text" id="briefing-text"></p>
+          <button class="release-btn" id="briefing-go">Entendi — liberar onda</button>
+        </div>
+
+        <div class="pause-veil" id="pause-veil" hidden>
+          <p>Jogo pausado</p>
+          <div class="pause-actions">
+            <button class="release-btn" id="pause-resume">Continuar</button>
+            <button class="ghost-btn" id="btn-restart-phase">Reiniciar fase</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="def-panel" aria-label="Defesas disponíveis">
+        <p class="def-panel-h">Defesas</p>
+        <ul id="def-list"></ul>
+
+        <div class="ability-box" id="ability-febre" hidden>
+          <p class="ability-h">Resposta sistêmica</p>
+          <div class="ability-row">
+            <span class="ability-name">Febre</span>
+            <span class="ability-cost" id="febre-cost">25 ⚡</span>
+          </div>
+          <p class="ability-rep">Não é uma célula: eleva a temperatura por um tempo, dificultando os invasores e acelerando um pouco a defesa — com custo se usada demais.</p>
+          <button class="release-btn ability-btn" id="btn-febre" type="button">Ativar febre</button>
+          <p class="ability-status" id="febre-status" aria-live="polite"></p>
+        </div>
+
+        <div class="ability-box" id="ability-soro" hidden>
+          <p class="ability-h">Resposta sistêmica</p>
+          <div class="ability-row">
+            <span class="ability-name">Soro</span>
+            <span class="ability-cost" id="soro-cost">30 ⚡</span>
+          </div>
+          <p class="ability-rep">Imunidade passiva artificial: neutraliza imediatamente as toxinas presentes em campo agora. Não constrói memória — é preciso reaplicar a cada vez.</p>
+          <button class="release-btn ability-btn" id="btn-soro" type="button">Aplicar soro</button>
+          <p class="ability-status" id="soro-status" aria-live="polite"></p>
+        </div>
+
+        <div class="def-tip" id="def-tip" aria-live="polite">
+          <p class="def-tip-hint">Selecione uma defesa e clique num nicho compatível.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- End-of-phase overlays -->
+    <div class="overlay" id="overlay-debrief" hidden>
+      <div class="panel-card">
+        <p class="panel-card-h panel-card-h--ok">Desempenho da defesa</p>
+        <div id="debrief-ratings" class="rating-grid"></div>
+        <div class="unlock-note" id="debrief-unlock"></div>
+        <div class="overlay-actions">
+          <button class="release-btn" id="debrief-continue">O que eu aprendi ›</button>
+          <button class="ghost-btn" id="debrief-replay">Jogar de novo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay-fail" hidden>
+      <div class="panel-card">
+        <p class="panel-card-h panel-card-h--fail">Análise da falha</p>
+        <p class="fail-lead">O tecido não resistiu. Veja o que pesou — o erro faz parte do aprendizado.</p>
+        <ol class="timeline" id="fail-timeline"></ol>
+        <p class="hint-box" id="fail-hint"></p>
+        <div class="overlay-actions">
+          <button class="release-btn" id="fail-retry">Tentar de novo</button>
+          <button class="ghost-btn" id="fail-concept">Rever conceito</button>
+          <button class="ghost-btn" data-goto="menu">Voltar ao menu</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay-learned" hidden>
+      <div class="panel-card">
+        <p class="panel-card-h panel-card-h--ok" id="learned-title">O que você aprendeu</p>
+        <div class="campaign-note" id="learned-campaign" hidden></div>
+        <ul class="learned-list" id="learned-list"></ul>
+        <div class="overlay-actions">
+          <button class="release-btn" data-goto="menu">Concluir</button>
+          <button class="ghost-btn" id="learned-encyclopedia">Abrir a Central do Sistema Imunitário</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay-interlude" hidden>
+      <div class="panel-card">
+        <p class="panel-card-h panel-card-h--ok" id="interlude-title">Central de Decisões</p>
+        <div id="interlude-body"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay-confirm-restart" hidden>
+      <div class="panel-card panel-card--sm">
+        <p class="panel-card-h panel-card-h--fail">Reiniciar fase</p>
+        <p class="fail-lead">Tem certeza que deseja reiniciar esta fase? Todo o progresso desta tentativa será perdido.</p>
+        <div class="overlay-actions">
+          <button class="ghost-btn" id="confirm-restart-cancel">Cancelar</button>
+          <button class="release-btn" id="confirm-restart-go">Reiniciar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay-help" hidden>
+      <div class="panel-card">
+        <p class="panel-card-h panel-card-h--ok" id="help-title">O que a Fase ensina</p>
+        <p class="fail-lead">Consulta rápida — os mesmos pontos que aparecem nos avisos durante o jogo, reunidos aqui para reler sem pressa. O jogo fica em pausa enquanto esta janela está aberta.</p>
+        <ul class="learned-list" id="help-list"></ul>
+        <div class="overlay-actions">
+          <button class="release-btn" id="help-close">Voltar ao jogo</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ ENCYCLOPEDIA ============ -->
+  <section id="screen-encyclopedia" class="screen" aria-labelledby="enc-title" hidden>
+    <div class="doc-wrap">
+      <button class="ghost-btn" data-goto="menu">‹ Menu</button>
+      <h2 id="enc-title">Central do Sistema Imunitário</h2>
+      <p class="doc-lead">Consulte aqui os conceitos trabalhados no jogo.</p>
+      <div class="enc-layout">
+        <nav class="enc-index" id="enc-index" aria-label="Índice de verbetes"></nav>
+        <div class="enc-body" id="enc-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="screen-settings" class="screen" aria-labelledby="set-title" hidden>
+    <div class="doc-wrap">
+      <button class="ghost-btn" data-goto="menu">‹ Menu</button>
+      <h2 id="set-title">Configurações</h2>
+      <form id="settings-form" class="settings-form">
+        <fieldset>
+          <legend>Jogo</legend>
+          <label class="set-row">
+            <span>Velocidade padrão</span>
+            <select name="speed">
+              <option value="1">1× (normal)</option>
+              <option value="0.75">0,75× (mais devagar)</option>
+              <option value="1.5">1,5× (mais rápido)</option>
+            </select>
+          </label>
+          <label class="set-row set-row--check">
+            <input type="checkbox" name="timemode" checked>
+            <span>Modo sem pressão de tempo — a onda só começa quando você mandar</span>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Acessibilidade</legend>
+          <label class="set-row">
+            <span>Tamanho do texto</span>
+            <select name="fontScale">
+              <option value="1">Padrão</option>
+              <option value="1.15">Grande</option>
+              <option value="1.3">Muito grande</option>
+            </select>
+          </label>
+          <label class="set-row set-row--check">
+            <input type="checkbox" name="contrast">
+            <span>Alto contraste</span>
+          </label>
+          <label class="set-row set-row--check">
+            <input type="checkbox" name="reducedMotion">
+            <span>Reduzir animações</span>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Som</legend>
+          <label class="set-row set-row--check">
+            <input type="checkbox" name="sound" checked>
+            <span>Efeitos sonoros</span>
+          </label>
+        </fieldset>
+        <div class="settings-actions">
+          <button type="button" class="ghost-btn" id="settings-reset">Restaurar progresso e configurações</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/content.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/towers.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/education.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/encyclopedia.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+
+<div id="load-error" hidden style="position:fixed;inset:0;z-index:999;background:#2a1015;color:#f7e9e2;font-family:Segoe UI,system-ui,sans-serif;padding:40px 24px;line-height:1.6">
+  <h1 style="font-size:22px;margin:0 0 12px">Os arquivos do jogo não foram carregados</h1>
+  <p>Isso costuma acontecer quando o <b>index.html</b> é aberto de dentro do arquivo .zip, ou quando as pastas <b>css</b> e <b>js</b> não estão ao lado dele.</p>
+  <p><b>Como resolver:</b> extraia o .zip completo (clique direito &gt; "Extrair tudo"), abra a pasta extraída e dê dois cliques em <b>index.html</b>. A pasta deve conter: index.html, css, js.</p>
+  <p>Se continuar, abra no Chrome, Edge ou Firefox e pressione F12 &gt; aba "Console" para ver o erro.</p>
+</div>
+<script>
+  if (typeof Router === "undefined" || typeof IMUNOQUEST_CONTENT === "undefined") {
+    document.getElementById("load-error").hidden = false;
+  }
+</script>
+</body>
+</html>
