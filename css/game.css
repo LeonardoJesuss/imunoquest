@@ -5,8 +5,13 @@
 #screen-game{
   display:none;
   flex-direction:column;
-  min-height:100vh;
+  min-height:100vh;min-height:100dvh;
   padding:12px 16px 20px;
+  padding-left:max(16px,env(safe-area-inset-left));
+  padding-right:max(16px,env(safe-area-inset-right));
+  padding-bottom:max(20px,env(safe-area-inset-bottom));
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
 }
 #screen-game.is-active{display:flex}
 
@@ -114,7 +119,10 @@
   background-color:rgba(209,72,60,.10);border-color:var(--red-deep);
 }
 .slot.is-filled{cursor:pointer;border-color:transparent;box-shadow:none;background:none}
-.slot:hover:not(.is-filled){border-color:var(--teal)}
+@media(hover:hover){.slot:hover:not(.is-filled){border-color:var(--teal)}}
+/* área de toque maior que o desenho do nicho */
+.slot::before{content:"";position:absolute;inset:-5px;border-radius:50%}
+.slot--surface::before{inset:-12px -6px}
 .slot .slot-label{
   position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);white-space:nowrap;
   font-family:var(--font-mono);letter-spacing:.04em;
@@ -151,7 +159,7 @@
   background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
   padding:9px 10px;color:var(--ink);cursor:pointer;
 }
-.def-card:hover:not(:disabled){border-color:var(--line-strong)}
+@media(hover:hover){.def-card:hover:not(:disabled){border-color:var(--line-strong)}}
 .def-card.is-selected{border-color:var(--teal);background:var(--surface-3)}
 .def-card:disabled{opacity:.5;cursor:not-allowed}
 .def-card .def-glyph{grid-row:1 / span 2;width:30px;height:30px}
@@ -328,15 +336,163 @@
 .tut-actions{display:flex;gap:8px;flex-wrap:wrap}
 .tut-actions .release-btn{padding:7px 14px;font-size:12.5px}
 .tut-actions .ghost-btn{padding:7px 12px;font-size:12px}
+.tutorial-bar--flow{position:static;margin:8px 0 0}
+
+/* ---------- dica "gire o celular" (só aparece com o celular em pé) ---------- */
+.rotate-hint{
+  display:none;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:8px;padding:7px 8px 7px 12px;
+  background:rgba(221,154,68,.12);border:1px solid var(--amber-deep);border-radius:9px;
+  font-size:12px;color:var(--ink);line-height:1.4;
+}
+.rotate-hint button{
+  flex:none;width:32px;height:32px;border-radius:50%;
+  background:none;border:0;color:var(--muted);font-size:14px;cursor:pointer;
+}
+.rotate-hint[hidden]{display:none}
 
 /* ---------- responsive ---------- */
+
+/* tablet em pé e telas estreitas: campo primeiro, defesas embaixo */
 @media(max-width:820px){
-  .game-stage{grid-template-columns:1fr}
-  .def-panel{order:-1}
-  #def-list{flex-direction:row;flex-wrap:wrap}
-  .def-card{width:calc(50% - 4px)}
+  .game-stage{grid-template-columns:1fr;gap:10px;margin-top:10px}
+  #def-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 }
-@media(max-width:520px){
-  .game-topbar{grid-template-columns:1fr;grid-template-areas:"back" "title" "controls" "hud"}
-  .game-controls{justify-content:flex-start}
+
+/* celular em pé */
+@media(max-width:600px){
+  #screen-game{
+    padding-top:8px;
+    padding-left:max(8px,env(safe-area-inset-left));
+    padding-right:max(8px,env(safe-area-inset-right));
+  }
+  .game-topbar{
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-areas:"back title" "hud hud" "controls controls";
+    gap:8px;padding-bottom:8px;
+  }
+  .game-phase-name{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hud{gap:5px;flex-wrap:nowrap}
+  .hud-pill{padding:4px 8px;gap:5px;font-size:12px;min-width:0}
+  .hud-pill--resource{padding:4px 9px}
+  .hud-pill--resource .hud-v{font-size:15px}
+  .hud-coin{width:15px;height:15px}
+  .hud-bar{width:34px}
+  .game-controls{gap:6px;justify-content:space-between}
+  .game-controls .icon-btn,.game-controls .release-btn{min-height:40px;padding:0 11px;font-size:12.5px}
+  .game-controls .release-btn{flex:1 1 auto}
+  .rotate-hint{display:flex}
+  .game-stage{margin-top:8px}
+  .canvas-holder{border-radius:10px}
+  .icon-btn--help{width:34px;height:34px;top:6px;right:6px;font-size:15px}
+  .slot--tissue{width:7.4%}
+  .slot .slot-label{font-size:9px;bottom:-13px}
+
+  .def-panel{padding:8px}
+  .def-panel-h{display:none}
+  .def-card{padding:8px 9px;grid-template-columns:26px minmax(0,1fr);gap:1px 8px;min-height:46px}
+  .def-card .def-glyph{width:26px;height:26px}
+  .def-card .def-name{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .def-card .def-rep{display:none}
+  .ability-rep{display:none}
+  .ability-box{margin-top:8px;padding-top:8px}
+  .def-tip{margin-top:8px;padding-top:8px}
+
+  /* avisos no alto da tela, para não cobrir os cartões de defesa; toque fecha */
+  .toast-stack{top:max(8px,env(safe-area-inset-top));bottom:auto;width:calc(100vw - 16px);pointer-events:none}
+  .toast{pointer-events:auto;padding:8px 12px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+  .toast-label{margin-bottom:3px;font-size:11px}
+  .toast-text{font-size:12px;line-height:1.4}
+  .toast-tag{display:none}
+  .toast:nth-last-child(n+2){display:none}
+
+  .overlay{padding:10px}
+  .panel-card{padding:18px 16px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px)}
+  .overlay-actions > *{flex:1 1 100%}
+  .briefing,.pause-veil{width:92%;padding:14px}
+  .briefing-text{font-size:13.5px;margin-bottom:12px}
+}
+
+/* celulares bem estreitos (360px e menos) */
+@media(max-width:380px){
+  .hud-pill{padding:4px 7px;gap:4px;font-size:11.5px}
+  .hud-pill--resource .hud-k{display:none}
+  .hud-bar{width:28px}
+  .game-controls .icon-btn,.game-controls .release-btn{padding:0 9px;font-size:12px}
+}
+
+/* celular deitado: o campo usa a altura toda e as defesas ficam ao lado */
+@media(orientation:landscape) and (max-height:500px){
+  :root{--game-reserved:66px;--panel-w:clamp(178px,25vw,240px)}
+  #screen-game{
+    padding-top:6px;padding-bottom:6px;
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+  .game-topbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding-bottom:6px}
+  .game-topbar > .ghost-btn{order:1;padding:0 11px;min-height:36px}
+  .game-phase-name{order:2;flex:1 1 0;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none}
+  .hud{order:3;flex-wrap:nowrap;gap:6px}
+  .game-controls{margin-left:auto}
+  .hud-pill{padding:3px 9px;font-size:12px}
+  .hud-pill--resource{padding:3px 10px}
+  .hud-pill--resource .hud-v{font-size:14px}
+  .hud-bar{width:40px}
+  .game-controls{order:4;flex-wrap:nowrap;gap:5px}
+  .game-controls .icon-btn,.game-controls .release-btn{min-height:36px;padding:0 10px;font-size:12px}
+
+  .game-stage{grid-template-columns:auto minmax(0,1fr);gap:8px;margin-top:6px}
+  .canvas-holder{
+    width:min(calc(100vw - 20px - var(--panel-w) - 8px),calc((100vh - var(--game-reserved)) * 1.6));
+    width:min(calc(100vw - 20px - var(--panel-w) - 8px),calc((100dvh - var(--game-reserved)) * 1.6));
+  }
+  .icon-btn--help{width:34px;height:34px;top:6px;right:6px;font-size:15px}
+
+  .def-panel{
+    padding:8px;overflow-y:auto;
+    max-height:calc(100vh - var(--game-reserved));
+    max-height:calc(100dvh - var(--game-reserved));
+    scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
+  }
+  .def-panel-h{display:none}
+  #def-list{gap:6px}
+  .def-card{padding:6px 7px;grid-template-columns:22px minmax(0,1fr);gap:0 6px;min-height:42px}
+  .def-card .def-glyph{width:22px;height:22px}
+  .def-card .def-name{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .def-card .def-cost{font-size:10.5px}
+  .def-card .def-rep{display:none}
+  .ability-rep{display:none}
+  .ability-box,.def-tip{margin-top:6px;padding-top:6px}
+  .ability-btn{padding:6px 0}
+  .def-tip .tip-game,.def-tip .tip-bio,.def-tip-hint{font-size:11px}
+
+  .toast-stack{left:8px;bottom:8px;transform:none;width:min(340px,46vw)}
+  .toast{padding:8px 11px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+  .toast-label{margin-bottom:3px;font-size:11px}
+  .toast-text{font-size:12px;line-height:1.4}
+  .toast-tag{display:none}
+  .toast:nth-last-child(n+2){display:none}
+
+  .overlay{padding:8px}
+  .panel-card{padding:14px 18px;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px)}
+  .briefing,.pause-veil{width:min(380px,80%);padding:12px 16px}
+  .briefing-text{font-size:13px;margin-bottom:10px}
+  .tutorial-bar{left:8px;right:8px;bottom:8px;padding:8px 11px}
+  .tut-text{font-size:12px;margin:2px 0 6px}
+}
+/* celular deitado largo: cabe o nome da fase na barra */
+@media(orientation:landscape) and (max-height:500px) and (min-width:900px){
+  .game-phase-name{display:block}
+}
+/* celular deitado estreito: a barra superior quebra em duas linhas */
+@media(orientation:landscape) and (max-height:500px) and (max-width:760px){
+  :root{--game-reserved:104px}
+  #def-list{grid-template-columns:1fr}
+  .def-card{min-height:38px;padding:5px 8px}
+}
+
+/* toque: alvos maiores nos controles do jogo */
+@media(pointer:coarse){
+  .icon-btn{min-height:40px}
+  .target-opt,.interlude-choice,.sell-btn{min-height:44px}
 }

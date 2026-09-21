@@ -32,6 +32,8 @@ Todos começam na Fase 1; cada fase destrava ao vencer a anterior.
 - **Central do Sistema Imunitário** (enciclopédia), com verbetes liberados conforme o progresso.
 - **Configurações**: velocidade, modo sem pressão de tempo, tamanho do texto, alto contraste,
   reduzir animações, som.
+- **Funciona no celular e no tablet**: de preferência com o celular deitado (campo maior, defesas ao lado);
+  em pé também funciona, com uma dica para girar. Toque perto de um nicho escolhe o mais próximo.
 - Funciona **100% offline**. Sem frameworks, sem CDN, sem backend. Só HTML, CSS e JavaScript.
 
 ## Atalhos de teclado (durante a fase)

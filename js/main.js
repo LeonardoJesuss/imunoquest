@@ -106,7 +106,7 @@ function wireSettingsForm(store) {
   });
 
   document.getElementById("settings-reset").addEventListener("click", () => {
-    if (confirm("Isto apaga o progresso, as configurações e os textos da Equipe/Referências salvos neste computador. Continuar?")) {
+    if (confirm("Isto apaga o progresso e as configurações salvos neste aparelho. Continuar?")) {
       IMUNOQUEST_STORE.reset();
       location.reload();
     }
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("pause-resume").addEventListener("click", () => Game.togglePause());
   document.getElementById("btn-restart-phase").addEventListener("click", () => {
     document.getElementById("overlay-confirm-restart").hidden = false;
-    document.getElementById("confirm-restart-go").focus();
+    document.getElementById("confirm-restart-go").focus({ preventScroll: true });
   });
   document.getElementById("confirm-restart-cancel").addEventListener("click", () => {
     document.getElementById("overlay-confirm-restart").hidden = true;
@@ -148,6 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("confirm-restart-go").addEventListener("click", () => {
     document.getElementById("overlay-confirm-restart").hidden = true;
     Game.restartPhase();
+  });
+  document.getElementById("rotate-hint-close").addEventListener("click", () => {
+    document.getElementById("rotate-hint").hidden = true;
   });
   document.getElementById("btn-help").addEventListener("click", () => Game.openHelp());
   document.getElementById("help-close").addEventListener("click", () => Game.closeHelp());

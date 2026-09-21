@@ -51,6 +51,19 @@ const UI = (function () {
         if (!b || b.disabled) return;
         if (onTargetPick) onTargetPick(b.dataset.target);
       });
+      /* no toque, um dedo não acerta um nicho pequeno: um toque perto de um
+         nicho (mas não em cima) escolhe o nicho mais próximo */
+      el.slotLayer.addEventListener("click", (ev) => {
+        if (ev.target.closest(".slot")) return;
+        if (!window.matchMedia("(pointer: coarse)").matches) return;
+        let best = null, bestD = Infinity;
+        slotButtons().forEach(b => {
+          const r = b.getBoundingClientRect();
+          const d = Math.hypot(ev.clientX - (r.left + r.width / 2), ev.clientY - (r.top + r.height / 2));
+          if (d < bestD) { bestD = d; best = b; }
+        });
+        if (best && bestD <= 34) best.click();
+      });
       defTipWired = true;
     }
   }
@@ -240,6 +253,8 @@ const UI = (function () {
     el.defTip.classList.remove("def-tip--flash");
     void el.defTip.offsetWidth; /* força reflow para a animação poder repetir */
     el.defTip.classList.add("def-tip--flash");
+    /* o painel pode rolar (celular): garante que o seletor de alvo fique à vista */
+    if (el.defTip.scrollIntoView) el.defTip.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 
   /* ---------- resposta febril (habilidade sistêmica, não é torre de nicho) ---------- */
@@ -291,6 +306,7 @@ const UI = (function () {
       '<p class="toast-label">' + escapeHtml(fb.label) + '</p>' +
       '<p class="toast-text">' + escapeHtml(fb.text) + '</p>' +
       (fb.tag ? '<span class="toast-tag">' + escapeHtml(fb.tag) + '</span>' : "");
+    d.addEventListener("click", () => d.remove());
     el.toastStack.appendChild(d);
     while (el.toastStack.children.length > 3) el.toastStack.removeChild(el.toastStack.firstChild);
     const timer = setTimeout(() => { d.remove(); }, 9000);
@@ -335,7 +351,7 @@ const UI = (function () {
       '<li><b>' + escapeHtml(x.k) + ':</b> ' + escapeHtml(x.v) + '</li>').join("");
     el.ovHelp.hidden = false;
     const closeBtn = document.getElementById("help-close");
-    if (closeBtn) closeBtn.focus();
+    if (closeBtn) closeBtn.focus({ preventScroll: true });
   }
   function hideHelp() { if (el.ovHelp) el.ovHelp.hidden = true; }
   function isHelpOpen() { return !!(el.ovHelp && !el.ovHelp.hidden); }
@@ -351,7 +367,7 @@ const UI = (function () {
     byId("debrief-continue").onclick = handlers.onContinue;
     byId("debrief-replay").onclick = handlers.onReplay;
     el.ovDebrief.hidden = false;
-    byId("debrief-continue").focus();
+    byId("debrief-continue").focus({ preventScroll: true });
   }
 
   function fail(data, handlers) {
@@ -361,7 +377,7 @@ const UI = (function () {
     byId("fail-retry").onclick = handlers.onRetry;
     byId("fail-concept").onclick = handlers.onConcept;
     el.ovFail.hidden = false;
-    byId("fail-retry").focus();
+    byId("fail-retry").focus({ preventScroll: true });
   }
 
   function learned(list, handlers, phase, campaignNote) {
@@ -379,7 +395,7 @@ const UI = (function () {
       }
     }
     el.ovLearned.hidden = false;
-    document.querySelector("#overlay-learned .release-btn").focus();
+    document.querySelector("#overlay-learned .release-btn").focus({ preventScroll: true });
   }
 
   /* ---------- interlúdios de decisão (Fase 6+) — não pontuados, sem game over ---------- */
@@ -405,7 +421,7 @@ const UI = (function () {
       b.addEventListener("click", () => onInterludeChoice(Number(b.dataset.i)));
     });
     const first = el.interludeBody.querySelector(".interlude-choice");
-    if (first) first.focus();
+    if (first) first.focus({ preventScroll: true });
   }
 
   function onInterludeChoice(i) {
@@ -436,7 +452,7 @@ const UI = (function () {
         renderInterludeStep();
       }
     });
-    nextBtn.focus();
+    nextBtn.focus({ preventScroll: true });
   }
 
   /* ---------- tutorial banner ---------- */
@@ -446,8 +462,14 @@ const UI = (function () {
       bar = document.createElement("div");
       bar.id = "tutorial-bar";
       bar.className = "tutorial-bar";
-      el.canvasHolder.appendChild(bar);
     }
+    /* celular em pé: o campo é pequeno demais para ter o texto por cima —
+       o tutorial entra no fluxo da página, logo acima do campo */
+    const inFlow = window.matchMedia("(max-width: 600px)").matches;
+    const stage = el.canvasHolder.closest(".game-stage");
+    bar.classList.toggle("tutorial-bar--flow", inFlow);
+    if (inFlow) { if (bar.nextElementSibling !== stage) stage.before(bar); }
+    else if (bar.parentNode !== el.canvasHolder) el.canvasHolder.appendChild(bar);
     bar.hidden = false;
     bar.innerHTML =
       '<span class="tut-tag">Tutorial</span>' +
